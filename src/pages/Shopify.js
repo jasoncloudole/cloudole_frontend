@@ -1,31 +1,19 @@
-import React, { Component } from 'react'
-import axios from 'axios'
-
-export class Shopify extends Component {
-    state = {
-        token: String
+import React from 'react'
+import queryString from 'query-string';
+import { useCookies } from 'react-cookie';
+import { Redirect } from 'react-router-dom';
+ 
+export default function Shopify (props) {
+    let params = queryString.parse(props.location.search)
+    const [cookies, setCookie] = useCookies(['shopifyShopName', 'shopifyToken']);
+    console.log(cookies)
+    if(params.shop){
+        setCookie('shopifyShopName', params.shop, { path: '/' });
     }
-    
-      componentDidMount() {
-        axios.get('/token')
-          .then(res => {
-            this.setState({
-              token: res.data
-            })   
-            console.log(this.state.token)        
-          })
-          .catch((err) => {
-            console.log(err)
-          }
-          )
-      }
-    render() {
-        return (
-            <div>
-                shopify{this.state.token}  HI
-            </div>
-        )
+    if(params.token){
+        setCookie('shopifyToken', params.token, { path: '/' });
     }
+    return (
+      <Redirect to={{ pathname: '/signup' }} />
+    )
 }
-
-export default Shopify
