@@ -3,14 +3,18 @@ import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
 import Box from '@material-ui/core/Box';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import { useCookies } from 'react-cookie';
+import axios from 'axios'
+import { useSnackbar } from 'notistack';
+import CheckIcon from '@material-ui/icons/Check';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import { green } from '@material-ui/core/colors';
 
 function Copyright() {
   return (
@@ -33,8 +37,11 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
   },
   avatar: {
+    backgroundColor: theme.palette.primary.main,
+  },
+  wrapper: {
     margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
+    position: 'relative',
   },
   form: {
     width: '100%', // Fix IE 11 issue.
@@ -43,15 +50,61 @@ const useStyles = makeStyles((theme) => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
+  buttonSuccess: {
+    backgroundColor: green[500],
+    '&:hover': {
+      backgroundColor: green[700],
+    },
+  },
+  fabProgress: {
+    color: green[500],
+    position: 'absolute',
+    top: -3,
+    left: -3,
+    zIndex: 1,
+  },
 }));
 
-export default function SignIn() {
+export default function SignIn(props) {
+    const { enqueueSnackbar } = useSnackbar();
     const classes = useStyles();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
-    const signInWithEmailAndPasswordHandler = (event, email, password) => {
-            event.preventDefault();
+    // eslint-disable-next-line
+    const [cookies, setCookie] = useCookies(['shopifyShopName', 'shopifyToken', 'userToken']);
+    const [loading, setLoading] = useState(false);
+    const [success, setSuccess] = useState(false);
+    const submitHandler = (event) => {
+        event.preventDefault();
+        if (!loading) {
+            setSuccess(false);
+            setLoading(true);
+            enqueueSnackbar('Logging in');
+            axios.post('/login', {
+                email: email,
+                password: password
+            }).then(function (response) {
+                let response_copy = JSON.parse(JSON.stringify(response.data))
+                setCookie('shopifyShopName', response_copy?.shop_name, { path: '/' });
+                setCookie('shopifyToken', response_copy?.shopify_token, { path: '/' });
+                setCookie('userToken', response_copy?.token, { path: '/' });
+                enqueueSnackbar('Logged in!', { 
+                    variant: 'success',
+                });
+                setSuccess(true);
+                setLoading(false);
+                props.history.push('/')
+            })
+            .catch(function () {
+                setLoading(false);
+                setError('Invalid email or password');
+                enqueueSnackbar('Invalid email or password!', { 
+                    variant: 'error',
+                });
+            });
+        }
+
     };
     const onChangeHandler = (event) => {
         const {name, value} = event.currentTarget;
@@ -66,13 +119,19 @@ export default function SignIn() {
         <Container component="main" maxWidth="xs">
         <CssBaseline />
         <div className={classes.paper}>
-            <Avatar className={classes.avatar}>
-            <LockOutlinedIcon />
-            </Avatar>
+            <div className={classes.wrapper}>
+                <Avatar className={classes.avatar}>
+                    {success ? <CheckIcon /> : <LockOutlinedIcon />}
+                </Avatar>
+                {loading && <CircularProgress size={46} thickness={3} className={classes.fabProgress} />}
+            </div>
             <Typography component="h1" variant="h5">
                 Sign in
             </Typography>
-            <form className={classes.form} noValidate>
+            <form className={classes.form} 
+                noValidate
+                onSubmit = {(event) => {submitHandler(event)}}
+            >
             <TextField
                 variant="outlined"
                 margin="normal"
@@ -97,21 +156,21 @@ export default function SignIn() {
                 onChange = {(event) => onChangeHandler(event)}
                 autoComplete="current-password"
             />
-            <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Remember me"
-            />
             <Button
                 type="submit"
                 fullWidth
                 variant="contained"
                 color="primary"
-                onClick = {(event) => {signInWithEmailAndPasswordHandler(event, email, password)}}
+                disabled={loading}
+                onClick = {(event) => {submitHandler(event)}}
                 className={classes.submit}
             >
                 Sign In
             </Button>
             </form>
+            <Typography variant="body2" color="textSecondary" align="center">
+                {error}
+            </Typography>
         </div>
         <Box mt={8}>
             <Copyright />

@@ -3,11 +3,14 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { CookiesProvider } from 'react-cookie';
-
+import { SnackbarProvider } from 'notistack';
+import 'fontsource-roboto';
 ReactDOM.render(
   <React.StrictMode>
     <CookiesProvider>
-      <App />
+      <SnackbarProvider maxSnack={3}>
+        <App />
+      </SnackbarProvider>
     </CookiesProvider>
   </React.StrictMode>,
   document.getElementById('root')
