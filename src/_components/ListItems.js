@@ -9,7 +9,6 @@ import LockIcon from '@material-ui/icons/Lock';
 import { useCookies } from 'react-cookie';
 import { useSnackbar } from 'notistack';
 
-
 export default function MainListItems () {
   const { enqueueSnackbar } = useSnackbar();
    // eslint-disable-next-line

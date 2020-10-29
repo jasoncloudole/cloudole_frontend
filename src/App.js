@@ -7,7 +7,7 @@ import Signup from './pages/Signup'
 import Shopify from './pages/Shopify'
 import axios from 'axios'
 import PrivateRoute from './_components/PrivateRoute';
-
+import 'fontsource-roboto';
 axios.defaults.baseURL = 'https://us-central1-cloudole-2f23d.cloudfunctions.net/api'
 
 function App() {

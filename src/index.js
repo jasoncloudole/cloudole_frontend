@@ -4,14 +4,33 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { CookiesProvider } from 'react-cookie';
 import { SnackbarProvider } from 'notistack';
-import 'fontsource-roboto';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import { createMuiTheme, ThemeProvider  } from '@material-ui/core/styles';
+
+const theme = createMuiTheme({
+  typography: {
+    body1:{
+      fontSize: '0.875rem',
+    }
+  },
+  overrides: {
+    MuiListItemText:{
+      primary:{
+        fontWeight: 'bold'
+      }
+    }
+  }
+});
 ReactDOM.render(
   <React.StrictMode>
-    <CookiesProvider>
-      <SnackbarProvider maxSnack={3}>
-        <App />
-      </SnackbarProvider>
-    </CookiesProvider>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <CookiesProvider>
+        <SnackbarProvider maxSnack={3}>
+          <App />
+        </SnackbarProvider>
+      </CookiesProvider>
+    </ThemeProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

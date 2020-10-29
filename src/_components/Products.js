@@ -71,16 +71,16 @@ export default function Products() {
   },[enqueueSnackbar]);
   return (
     <React.Fragment>
-    <div style={{ height: 400, width: '100%' }}>
-      <DataGrid
-        components={{
-          loadingOverlay: CustomLoadingOverlay,
-        }}
-        loading={loading}
-        columns={columns}
-        rows={products}
-      />
-    </div>
+      <div style={{ height: 400, width: '100%' }}>
+        <DataGrid
+          components={{
+            loadingOverlay: CustomLoadingOverlay,
+          }}
+          loading={loading}
+          columns={columns}
+          rows={products}
+        />
+      </div>
     </React.Fragment>
   );
 }
