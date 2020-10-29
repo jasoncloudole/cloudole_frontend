@@ -7,10 +7,10 @@ export default function Shopify (props) {
     let params = queryString.parse(props.location.search)
     const [cookies, setCookie] = useCookies(['shopifyShopName', 'shopifyToken']);
     if(params.shop){
-        setCookie('shopifyShopName', params.shop, { path: '/' });
+        setCookie('shopifyShopName', params.shop, { path: '/' , maxAge:2147483647});
     }
     if(params.token){
-        setCookie('shopifyToken', params.token, { path: '/' });
+        setCookie('shopifyToken', params.token, { path: '/', maxAge:2147483647 });
     }
     return (
         (cookies.shopifyShopName && cookies.shopifyToken) && <Redirect to={{ pathname: '/signup' }} />

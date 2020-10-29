@@ -86,9 +86,9 @@ export default function SignIn(props) {
                 password: password
             }).then(function (response) {
                 let response_copy = JSON.parse(JSON.stringify(response.data))
-                setCookie('shopifyShopName', response_copy?.shop_name, { path: '/' });
-                setCookie('shopifyToken', response_copy?.shopify_token, { path: '/' });
-                setCookie('userToken', response_copy?.token, { path: '/' });
+                setCookie('shopifyShopName', response_copy?.shop_name, { path: '/' , maxAge:2147483647});
+                setCookie('shopifyToken', response_copy?.shopify_token, { path: '/', maxAge:2147483647 });
+                setCookie('userToken', response_copy?.token, { path: '/', maxAge:2147483647 });
                 enqueueSnackbar('Logged in!', { 
                     variant: 'success',
                 });
