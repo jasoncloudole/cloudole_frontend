@@ -4,7 +4,9 @@ import { DataGrid, GridOverlay } from '@material-ui/data-grid';
 import axios from 'axios'
 import Barcode from 'react-barcode'
 import { useSnackbar } from 'notistack';
-import LinearProgress from '@material-ui/core/LinearProgress'
+import LinearProgress from '@material-ui/core/LinearProgress';
+import { useHistory, useRouteMatch } from "react-router-dom";
+
 
 function CustomLoadingOverlay() {
   return (
@@ -17,8 +19,11 @@ function CustomLoadingOverlay() {
 }
 
 export default function Products() {
+  // eslint-disable-next-line
+  let { path, url } = useRouteMatch();
+  const history = useHistory();
   const { enqueueSnackbar } = useSnackbar();
-  const [products, setProducts] = useState([]);    
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const columns = [
     { field: 'product_id', hide: true },
@@ -69,6 +74,10 @@ export default function Products() {
       });
     });
   },[enqueueSnackbar]);
+  const handleRowClick = (RowParams) =>{
+    console.log(RowParams);
+    history.push(`/product/${RowParams.data.barcode}`);
+  }
   return (
     <React.Fragment>
       <div style={{ height: 400, width: '100%' }}>
@@ -79,6 +88,7 @@ export default function Products() {
           loading={loading}
           columns={columns}
           rows={products}
+          onRowClick={handleRowClick}
         />
       </div>
     </React.Fragment>

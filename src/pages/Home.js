@@ -1,21 +1,21 @@
 import React from 'react'
 import Dashboard from '../_components/Dashboard'
+import GoogleMaps from '../_components/Maps'
 import Wrapper from '../_components/Wrapper'
 import {
     Switch,
-    Route,
-    useRouteMatch
+    Route
   } from "react-router-dom";
 
 export default function Home () {
-    let { path } = useRouteMatch();
     return (
         <Wrapper>
             <Switch>
-                <Route exact path={path}>
+                <Route exact path={'/'}>
                     <Dashboard/>
                 </Route>
-                <Route path={`${path}/product/:Id`}>
+                <Route path={`/product/:barcode`}>
+                    <GoogleMaps/>
                 </Route>
             </Switch>
         </Wrapper>
