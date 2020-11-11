@@ -154,12 +154,14 @@ const SimpleMap = (props) => {
                   }, (place) => {
                     setDetails(place);
                     setLoading(true);
+                    let latitude = place.geometry.location.lat();
+                    let longitude = place.geometry.location.lng();
                     axios.get('/storeNearCustomer', {headers:{
                       shopifyToken: Cookies.get('shopifyToken'),
                       shopifyShopName: Cookies.get('shopifyShopName'),
-                      latitude: place.geometry.location.lat,
-                      longitude: place.geometry.location.lng,
-                      distance: 5000,
+                      latitude,
+                      longitude,
+                      distance: 5,
                       barcode: barcode,
                     }}).then(function (response) {
                       setStoreList(response.data);
