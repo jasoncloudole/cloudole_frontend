@@ -15,10 +15,10 @@ function App() {
     <div className="App">
       <Router>
         <Switch>
-          <PrivateRoute path="/" component={Home} />
           <Route exact path="/login" component={Login} />
           <Route exact path="/signup" component={Signup} />
           <Route exact path="/shopify" component={Shopify} />
+          <PrivateRoute path="/" component={Home} />
 
         </Switch>
       </Router>

@@ -6,11 +6,22 @@ import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
 import Typography from '@material-ui/core/Typography';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import { makeStyles } from '@material-ui/core/styles';
 import parse from 'autosuggest-highlight/parse';
 import throttle from 'lodash/throttle';
 import clsx from 'clsx';
 import NotFoundSVG from '../_assets/around_the_world.svg';
+import Cookies from 'js-cookie';
+import { useParams } from "react-router-dom";
+import axios from 'axios'
+import { useSnackbar } from 'notistack';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import IconButton from '@material-ui/core/IconButton';
+import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart';
 const useStyles = makeStyles((theme) => ({
   icon: {
     color: theme.palette.text.secondary,
@@ -31,10 +42,22 @@ const useStyles = makeStyles((theme) => ({
   },
   image: {
     width:"100%",
-  }
+  },
+  list:{
+    width: '100%',
+  },
+  loadingContainer:{
+    display: 'flex',
+    width: "100%",
+    height: "100%",
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 }));
 
 const SimpleMap = (props) => {
+  let { barcode } = useParams();
+  const { enqueueSnackbar } = useSnackbar();
 
   const classes = useStyles();
   const [value, setValue] = React.useState(null);
@@ -48,6 +71,9 @@ const SimpleMap = (props) => {
   const [latlngbounds, setLatlngbounds] = React.useState(null);
   const [map, setMap] =  React.useState(null);
   const [maps, setMaps] = React.useState(null);
+  const [storelist, setStoreList] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+  const [markers, setMarkers] = React.useState([]);
   // const [shopList, setShopList] = React.useState([]);
   const handleApiLoaded = (map, maps) => {
     setMap(map);
@@ -64,14 +90,6 @@ const SimpleMap = (props) => {
       }, 200),
     [autocompleteService],
   );
-
-  const fetchPlace = React.useMemo(
-    () =>
-      throttle((request, callback) => {
-        placeService.getDetails(request, callback);
-      }, 200),
-    [placeService],
-  );
   React.useEffect(() => {
     let active = true;
 
@@ -82,22 +100,6 @@ const SimpleMap = (props) => {
     if (inputValue === '') {
       setOptions(value ? [value] : []);
       return undefined;
-    }
-    if (value) {
-      console.log(value);
-      fetchPlace({
-        placeId: value.place_id,
-        fields: ["name", "formatted_address", "place_id", "geometry"]
-      }, (place) => {
-        setDetails(place);
-        new maps.Marker({
-          map,
-          position: place.geometry.location,
-        });
-        map.setCenter(place.geometry.location);
-        latlngbounds.extend(place.geometry.location);
-        map.fitBounds(latlngbounds);
-      })
     }
     fetchAutocomplete({ input: inputValue }, (results) => {
       if (active) {
@@ -115,7 +117,7 @@ const SimpleMap = (props) => {
     return () => {
       active = false;
     };
-  }, [value, inputValue, fetchAutocomplete,fetchPlace, autocompleteService, map, maps.Marker, latlngbounds]);
+  }, [value, inputValue, fetchAutocomplete, autocompleteService]);
 
   return (
       <Grid container spacing={3}>
@@ -142,9 +144,63 @@ const SimpleMap = (props) => {
               includeInputInList
               filterSelectedOptions
               value={value}
-              onChange={(event, newValue) => {
+              onChange={(_event, newValue) => {
                 setOptions(newValue ? [newValue, ...options] : options);
                 setValue(newValue);
+                if(newValue){
+                  placeService.getDetails({
+                    placeId: newValue.place_id,
+                    fields: ["name", "formatted_address", "place_id", "geometry"]
+                  }, (place) => {
+                    setDetails(place);
+                    setLoading(true);
+                    axios.get('/storeNearCustomer', {headers:{
+                      shopifyToken: Cookies.get('shopifyToken'),
+                      shopifyShopName: Cookies.get('shopifyShopName'),
+                      latitude: place.geometry.location.lat,
+                      longitude: place.geometry.location.lng,
+                      distance: 5000,
+                      barcode: barcode,
+                    }}).then(function (response) {
+                      setStoreList(response.data);
+                      for (let mark of markers){
+                        mark.setMap(null);
+                      }
+                      const mks = [new maps.Marker({
+                        map,
+                        position: place.geometry.location,
+                        icon: {url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"}
+                      })]
+                      const bounds = new maps.LatLngBounds();
+                      bounds.extend(place.geometry.location);
+                      for(let store of response.data){
+                        let lat = store.coordinates.latitude;
+                        let lng = store.coordinates.longitude;
+                        mks.push(new maps.Marker({
+                          map,
+                          position: {lat,lng}
+                        }))
+                        bounds.extend({lat,lng});
+                      }
+                      
+                      setMarkers(mks);
+                      map.fitBounds(bounds);
+                      setLoading(false);
+                      enqueueSnackbar('Loaded stores!', { 
+                          variant: 'success',
+                      });
+                    })
+                    .catch(function () {
+                      setLoading(false);
+                      enqueueSnackbar('Server error, unable to load stores', { 
+                          variant: 'error',
+                      });
+                    });
+                    map.setCenter(place.geometry.location);
+                    latlngbounds.extend(place.geometry.location);
+                    map.fitBounds(latlngbounds);
+                  })
+                }
               }}
               onInputChange={(event, newInputValue) => {
                 setInputValue(newInputValue);
@@ -181,12 +237,27 @@ const SimpleMap = (props) => {
                 );
               }}
             />
-            <div className={classes.imageContainer}>
+            {!loading && storelist.length === 0 && <div className={classes.imageContainer}>
               <img src={NotFoundSVG} alt="icon" className={classes.image} />
               <Typography variant="overline" color="primary">
                 We cannot find any nearby stores
               </Typography>
-            </div>
+            </div>}
+            {loading && <div className={classes.loadingContainer}>
+              <CircularProgress className={classes.loading}/>
+            </div>}
+            {!loading && storelist.length > 0 && <List className={classes.list}>{
+              storelist.map((store, key) => (
+                <ListItem key = {key}>
+                  <ListItemText primary={store.product.title} secondary={`$${store.product.price}`} />
+                  <ListItemSecondaryAction>
+                    <IconButton edge="end" aria-label="delete">
+                      <AddShoppingCartIcon/>
+                    </IconButton>
+                  </ListItemSecondaryAction>
+                </ListItem>        
+              ))
+            }</List>}
           </Paper>
         </Grid>
       </Grid>

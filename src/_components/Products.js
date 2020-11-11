@@ -6,7 +6,7 @@ import Barcode from 'react-barcode'
 import { useSnackbar } from 'notistack';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { useHistory, useRouteMatch } from "react-router-dom";
-
+import Button from '@material-ui/core/Button';
 
 function CustomLoadingOverlay() {
   return (
@@ -26,7 +26,6 @@ export default function Products() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const columns = [
-    { field: 'product_id', hide: true },
     { field: 'variant_id', hide: true },
     {
       field: 'barcode',
@@ -44,15 +43,27 @@ export default function Products() {
     {
       field: 'price',
       headerName: 'Price',
-
       type: 'number',
 
     },
     {
       field: 'quantity',
       headerName: 'Quantity',
-
-      type: 'number'
+      type: 'number',
+    },
+    { 
+      field: 'product_id',
+      headerName: 'Action',
+      renderCell: (params) => (
+        <Button
+        variant="contained"
+        color="primary"
+        size="small"
+        onClick={()=>{history.push(`/product/${params.data.barcode}`)}}
+      >
+        Buy
+      </Button>    
+      ),
     },
   ]
   useEffect(() => {
@@ -75,8 +86,7 @@ export default function Products() {
     });
   },[enqueueSnackbar]);
   const handleRowClick = (RowParams) =>{
-    console.log(RowParams);
-    history.push(`/product/${RowParams.data.barcode}`);
+    // history.push(`/product/${RowParams.data.barcode}`);
   }
   return (
     <React.Fragment>

@@ -7,15 +7,15 @@ import {
     Route
   } from "react-router-dom";
 
-export default function Home () {
+export default function Home (props) {
     return (
         <Wrapper>
             <Switch>
                 <Route exact path={'/'}>
-                    <Dashboard/>
+                    <Dashboard {...props}/>
                 </Route>
-                <Route path={`/product/:barcode`}>
-                    <GoogleMaps/>
+                <Route exact path={`/product/:barcode`}>
+                    <GoogleMaps {...props}/>
                 </Route>
             </Switch>
         </Wrapper>
