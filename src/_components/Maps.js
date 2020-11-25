@@ -22,6 +22,9 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import IconButton from '@material-ui/core/IconButton';
 import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart';
+import Breadcrumbs from '@material-ui/core/Breadcrumbs';
+import Link from '@material-ui/core/Link';
+
 const useStyles = makeStyles((theme) => ({
   icon: {
     color: theme.palette.text.secondary,
@@ -120,7 +123,15 @@ const SimpleMap = (props) => {
   }, [value, inputValue, fetchAutocomplete, autocompleteService]);
 
   return (
-      <Grid container spacing={3}>
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={12} lg={12}>
+          <Breadcrumbs aria-label="breadcrumb">
+            <Link color="inherit" href="/">
+              Dashboard
+            </Link>
+            <Typography color="textPrimary">Product</Typography>
+          </Breadcrumbs>
+        </Grid>
         <Grid item xs={12} md={6} lg={8}>
           <Paper className={fixedHeightPaper}>
             <GoogleMapReact
@@ -154,8 +165,13 @@ const SimpleMap = (props) => {
                   }, (place) => {
                     setDetails(place);
                     setLoading(true);
-                    let latitude = place.geometry.location.lat();
-                    let longitude = place.geometry.location.lng();
+                    let latitude = Number(place.geometry.location.lat());
+                    let longitude = Number(place.geometry.location.lng());
+                    let mk = new maps.Marker({
+                      map,
+                      position: place.geometry.location,
+                      icon: {url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"}
+                    })
                     axios.get('/storeNearCustomer', {headers:{
                       shopifyToken: Cookies.get('shopifyToken'),
                       shopifyShopName: Cookies.get('shopifyShopName'),
@@ -168,11 +184,7 @@ const SimpleMap = (props) => {
                       for (let mark of markers){
                         mark.setMap(null);
                       }
-                      const mks = [new maps.Marker({
-                        map,
-                        position: place.geometry.location,
-                        icon: {url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"}
-                      })]
+                      const mks = [mk]
                       const bounds = new maps.LatLngBounds();
                       bounds.extend(place.geometry.location);
                       for(let store of response.data){
