@@ -1,19 +1,20 @@
 import React, {useState} from 'react';
+
 import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import Link from '@material-ui/core/Link';
 import Box from '@material-ui/core/Box';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
-import { useCookies } from 'react-cookie';
-import axios from 'axios'
-import { useSnackbar } from 'notistack';
+import Button from '@material-ui/core/Button';
 import CheckIcon from '@material-ui/icons/Check';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import Container from '@material-ui/core/Container';
+import Link from '@material-ui/core/Link';
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
+import axios from 'axios'
 import { green } from '@material-ui/core/colors';
+import { makeStyles } from '@material-ui/core/styles';
+import { useCookies } from 'react-cookie';
+import { useSnackbar } from 'notistack';
 
 function Copyright() {
   return (
@@ -88,6 +89,7 @@ export default function SignIn(props) {
                 setCookie('shopifyShopName', response_copy?.shop_name, { path: '/' , maxAge:2147483647});
                 setCookie('shopifyToken', response_copy?.shopify_token, { path: '/', maxAge:2147483647 });
                 setCookie('userToken', response_copy?.token, { path: '/', maxAge:2147483647 });
+                setCookie('stripeID', response_copy?.stripe_id, { path: '/', maxAge:2147483647 });
                 enqueueSnackbar('Logged in!', { 
                     variant: 'success',
                 });

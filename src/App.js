@@ -1,27 +1,36 @@
-import React from 'react';
 import './App.css';
-import {BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import 'fontsource-roboto';
+
+import {Route, BrowserRouter as Router, Switch} from 'react-router-dom'
+
+import {Elements} from '@stripe/react-stripe-js';
 import Home from './pages/Home'
 import Login from './pages/Login'
-import Signup from './pages/Signup'
-import Shopify from './pages/Shopify'
-import axios from 'axios'
 import PrivateRoute from './_components/PrivateRoute';
-import 'fontsource-roboto';
+import React from 'react';
+import Shopify from './pages/Shopify'
+import Signup from './pages/Signup'
+import axios from 'axios'
+import {loadStripe} from '@stripe/stripe-js';
+
 axios.defaults.baseURL = 'https://us-central1-cloudole-2f23d.cloudfunctions.net/api'
+
+const stripePromise = loadStripe('pk_test_dpjyOGsBaKQFXRYd5gTVoBYL00mtQJMKeo');
 
 function App() {
   return (
     <div className="App">
-      <Router>
-        <Switch>
-          <Route exact path="/login" component={Login} />
-          <Route exact path="/signup" component={Signup} />
-          <Route exact path="/shopify" component={Shopify} />
-          <PrivateRoute path="/" component={Home} />
+      <Elements stripe={stripePromise}>
+        <Router>
+          <Switch>
+            <Route exact path="/login" component={Login} />
+            <Route exact path="/signup" component={Signup} />
+            <Route exact path="/shopify" component={Shopify} />
+            <PrivateRoute path="/" component={Home} />
 
-        </Switch>
-      </Router>
+          </Switch>
+        </Router>
+      </Elements>
     </div>
   );
 }
