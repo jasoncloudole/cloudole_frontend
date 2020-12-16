@@ -1,11 +1,13 @@
-import React from 'react'
+import {
+    Route,
+    Switch
+} from "react-router-dom";
+
 import Dashboard from '../_components/Dashboard'
 import GoogleMaps from '../_components/Maps'
+import OrderHistory from '../_components/OrderHistory'
+import React from 'react'
 import Wrapper from '../_components/Wrapper'
-import {
-    Switch,
-    Route
-  } from "react-router-dom";
 
 export default function Home (props) {
     return (
@@ -13,6 +15,9 @@ export default function Home (props) {
             <Switch>
                 <Route exact path={'/'}>
                     <Dashboard {...props}/>
+                </Route>
+                <Route exact path={'/order-history'}>
+                    <OrderHistory {...props}/>
                 </Route>
                 <Route exact path={`/product/:barcode`}>
                     <GoogleMaps {...props}/>

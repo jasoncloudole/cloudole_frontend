@@ -38,7 +38,7 @@ export default function MainListItems () {
       </ListItemIcon>
       <ListItemText primary="Current Orders" />
     </ListItem>
-    <ListItem button>
+    <ListItem button onClick={() => history.push('/order-history')}>
       <ListItemIcon>
         <LayersIcon />
       </ListItemIcon>
