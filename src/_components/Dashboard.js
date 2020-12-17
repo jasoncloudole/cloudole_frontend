@@ -1,4 +1,4 @@
-import { Button, Typography } from '@material-ui/core';
+import { Button, CircularProgress, Typography } from '@material-ui/core';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
 import Axios from 'axios';
@@ -10,6 +10,7 @@ import Products from './Products';
 import React from 'react';
 import TotalEarned from './TotalEarned';
 import clsx from 'clsx';
+import { green } from '@material-ui/core/colors';
 import { makeStyles } from '@material-ui/core/styles';
 import { useHistory } from 'react-router-dom';
 
@@ -27,7 +28,19 @@ const useStyles = makeStyles((theme) => ({
     display:'flex',
     justifyContent:'space-between',
     alignItems:'center'
-  }
+  },
+  wrapper: {
+    margin: theme.spacing(1),
+    position: 'relative',
+  },
+  buttonProgress: {
+    color: green[500],
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12,
+  },
 }));
 
 export default function Dashboard() {
@@ -35,34 +48,45 @@ export default function Dashboard() {
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
   const setAccountLink = useStoreActions(actions => actions.setStripeAccountLinks);
   const accountLink = useStoreState(state => state.stripeAccountLinks)
-  const history = useHistory()
   React.useEffect(() => {
-    Axios.post('/stripe-account-link', {
-      email: Cookies.get('email'),
-    }).then(function (response) {
-      setAccountLink(response.data);
-    });
-  });
+    if(!accountLink.url){
+      Axios.post('/setupConnectedAccount', {
+        email: Cookies.get('email'),
+      }).then(function (response) {
+        setAccountLink(response.data);
+      });
+    }
+  },[accountLink]);
   return (
     <Grid container spacing={3}>
-      {accountLink.setup &&       
+      {accountLink.isSetup &&       
       <Grid item xs={12} md={8} lg={9}>
         <Paper className={fixedHeightPaper}>
           <Chart />
         </Paper>
       </Grid>}
-      {accountLink.setup && 
+      {accountLink.isSetup && 
       <Grid item xs={12} md={4} lg={3}>
         <Paper className={fixedHeightPaper}>
           <TotalEarned/>
         </Paper>
       </Grid>}
-      {!accountLink.setup &&
+      {!accountLink.isSetup &&
       <Grid item xs={12}>
         <Paper className={classes.paper}>
           <div className={classes.setupPayment}>
             <Typography color='secondary'>You have not yet set up your payment info, your products will not be listed on our platform</Typography>
-            <Button color='primary' variant='contained' onClick={() => history.push(accountLink.url)}>Set up payment info</Button>
+            <div className={classes.wrapper}>
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={!accountLink.url}
+                onClick={() => window.location.replace(accountLink.url)}
+              >
+                Set up payment info
+              </Button>
+              {!accountLink.url && <CircularProgress size={24} className={classes.buttonProgress} />}
+            </div>
           </div>
         </Paper>
       </Grid>
