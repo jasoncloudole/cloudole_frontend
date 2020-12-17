@@ -15,6 +15,7 @@
     "@testing-library/user-event": "^7.1.2",
     "autosuggest-highlight": "^3.1.1",
     "axios": "^0.20.0",
+    "easy-peasy": "^4.0.1",
     "fontsource-roboto": "^3.0.3",
     "google-map-react": "^2.1.9",
     "js-cookie": "^2.2.1",

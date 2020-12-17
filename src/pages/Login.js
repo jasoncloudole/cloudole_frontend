@@ -90,6 +90,7 @@ export default function SignIn(props) {
                 setCookie('shopifyToken', response_copy?.shopify_token, { path: '/', maxAge:2147483647 });
                 setCookie('userToken', response_copy?.token, { path: '/', maxAge:2147483647 });
                 setCookie('stripeID', response_copy?.stripe_id, { path: '/', maxAge:2147483647 });
+                setCookie('email', email, { path: '/', maxAge:2147483647 });
                 enqueueSnackbar('Logged in!', { 
                     variant: 'success',
                 });

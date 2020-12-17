@@ -95,6 +95,7 @@ export default function SignUp(props) {
                 shopName: Cookies.get('shopifyShopName')
             }).then(function (response) {
                 let response_copy = JSON.parse(JSON.stringify(response.data))
+                setCookie('email', email, { path: '/', maxAge:2147483647 });
                 setCookie('userToken', response_copy?.token, { path: '/', maxAge:2147483647 });
                 setCookie('stripeID', response_copy?.stripe_id, { path: '/', maxAge:2147483647 });
                 enqueueSnackbar('Logged in!', { 

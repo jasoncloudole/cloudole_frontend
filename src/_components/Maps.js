@@ -26,6 +26,7 @@ import parse from 'autosuggest-highlight/parse';
 import throttle from 'lodash/throttle';
 import { useParams } from "react-router-dom";
 import { useSnackbar } from 'notistack';
+import { useStoreActions } from 'easy-peasy';
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -66,9 +67,9 @@ const useStyles = makeStyles((theme) => ({
 const SimpleMap = (props) => {
   let { barcode } = useParams();
   const { enqueueSnackbar } = useSnackbar();
-
   const classes = useStyles();
   const [value, setValue] = React.useState(null);
+  const setCustomerLocation = useStoreActions(actions => actions.setCustomerLocation);
   // eslint-disable-next-line
   const [details, setDetails] = React.useState(null);
   const [inputValue, setInputValue] = React.useState('');
@@ -102,7 +103,6 @@ const SimpleMap = (props) => {
 
   React.useEffect(() => {
     let active = true;
-
     if (!autocompleteService) {
       return undefined;
     }
@@ -171,6 +171,9 @@ const SimpleMap = (props) => {
                   fields: ["name", "formatted_address", "place_id", "geometry", "address_components"]
                 }, (place) => {
                   console.log(place);
+                  const location = {};
+                  place.address_components.forEach(item => location[item.types[0]] = item.short_name);
+                  setCustomerLocation(location);
                   setDetails(place);
                   setLoading(true);
                   let latitude = Number(place.geometry.location.lat());

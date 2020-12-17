@@ -1,11 +1,14 @@
+import * as serviceWorker from './serviceWorker';
+
+import { StoreProvider, action, createStore } from 'easy-peasy';
+import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+
+import App from './App';
+import { CookiesProvider } from 'react-cookie';
+import CssBaseline from '@material-ui/core/CssBaseline';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
-import { CookiesProvider } from 'react-cookie';
 import { SnackbarProvider } from 'notistack';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import { createMuiTheme, ThemeProvider  } from '@material-ui/core/styles';
 
 const theme = createMuiTheme({
   typography: {
@@ -21,16 +24,30 @@ const theme = createMuiTheme({
     }
   }
 });
+
+const store = createStore({
+  stripeAccountLinks : {},
+  setStripeAccountLinks: action((state, payload) => {
+    state.stripeAccountLinks=payload;
+  }),
+  customerLocation: {},
+  setCustomerLocation: action((state, payload) => {
+    state.customerLocation=payload;
+  }),
+});
+
 ReactDOM.render(
   <React.StrictMode>
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <CookiesProvider>
-        <SnackbarProvider maxSnack={3}>
-          <App />
-        </SnackbarProvider>
-      </CookiesProvider>
-    </ThemeProvider>
+    <StoreProvider store={store}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <CookiesProvider>
+          <SnackbarProvider maxSnack={3}>
+            <App />
+          </SnackbarProvider>
+        </CookiesProvider>
+      </ThemeProvider>
+    </StoreProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

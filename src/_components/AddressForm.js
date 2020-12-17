@@ -6,6 +6,7 @@ import Grid from '@material-ui/core/Grid';
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
+import { useStoreState } from 'easy-peasy';
 
 const useStyles = makeStyles((theme) => ({
   buttons: {
@@ -20,6 +21,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function AddressForm({handleBack, handleNext}) {
   const classes = useStyles();
+  const address = useStoreState(state => state.customerLocation);
   return (
     <React.Fragment>
       <Typography variant="h6" gutterBottom>
@@ -52,6 +54,7 @@ export default function AddressForm({handleBack, handleNext}) {
             id="address1"
             name="address"
             label="Street Address"
+            value={address.street_number + ' ' + address.route}
             fullWidth
             autoComplete="address"
           />
@@ -62,12 +65,15 @@ export default function AddressForm({handleBack, handleNext}) {
             id="city"
             name="city"
             label="City"
+            value={address.locality}
             fullWidth
             autoComplete="shipping address-level2"
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <TextField id="state" name="state" label="Province" fullWidth />
+          <TextField id="state" name="state" label="Province" fullWidth  
+            value={address.administrative_area_level_1}
+            />
         </Grid>
         <Grid item xs={12} sm={6}>
           <TextField
@@ -76,6 +82,7 @@ export default function AddressForm({handleBack, handleNext}) {
             name="zip"
             label="Postal code"
             fullWidth
+            value={address.postal_code}
             autoComplete="shipping postal-code"
           />
         </Grid>
@@ -86,6 +93,7 @@ export default function AddressForm({handleBack, handleNext}) {
             name="country"
             label="Country"
             fullWidth
+            value={address.country}
             autoComplete="shipping country"
           />
         </Grid>

@@ -104,6 +104,9 @@ export default function Checkout(props) {
                     Your order number is #2001539. We have emailed your order confirmation, and will
                     send you an update when your order has shipped.
                 </Typography>
+                <Button onClick={props.onCancel} className={classes.button}>
+                  Done
+                </Button>
                 </React.Fragment>
             ) : (
                 <React.Fragment>
