@@ -1,8 +1,9 @@
-import React from 'react';
-import Cookies from 'js-cookie';
-import { Route, Redirect } from 'react-router-dom';
+import { Redirect, Route } from 'react-router-dom';
 
- const PrivateRoute  = ({ component: Component, ...rest }) => {
+import Cookies from 'js-cookie';
+import React from 'react';
+
+const PrivateRoute  = ({ component: Component, ...rest }) => {
     const shopifyToken = Cookies.get('shopifyToken');
     const userToken = Cookies.get('userToken');
     const shopifyShopName = Cookies.get('shopifyShopName');

@@ -2,7 +2,6 @@ import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import Checkout from './Checkout';
-import { ChevronLeftRounded } from '@material-ui/icons';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Cookies from 'js-cookie';
 import GoogleMapReact from 'google-map-react';

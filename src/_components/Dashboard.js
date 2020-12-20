@@ -12,7 +12,6 @@ import TotalEarned from './TotalEarned';
 import clsx from 'clsx';
 import { green } from '@material-ui/core/colors';
 import { makeStyles } from '@material-ui/core/styles';
-import { useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -56,7 +55,7 @@ export default function Dashboard() {
         setAccountLink(response.data);
       });
     }
-  },[accountLink]);
+  },[accountLink, setAccountLink]);
   return (
     <Grid container spacing={3}>
       {accountLink.isSetup &&       

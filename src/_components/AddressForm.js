@@ -1,7 +1,5 @@
 import { Button, makeStyles } from '@material-ui/core';
 
-import Checkbox from '@material-ui/core/Checkbox';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Grid from '@material-ui/core/Grid';
 import React from 'react';
 import TextField from '@material-ui/core/TextField';

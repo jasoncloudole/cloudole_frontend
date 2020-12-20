@@ -7,6 +7,7 @@ import {Elements} from '@stripe/react-stripe-js';
 import Home from './pages/Home'
 import Login from './pages/Login'
 import PrivateRoute from './_components/PrivateRoute';
+import PublicRoute from './_components/PublicRoute';
 import React from 'react';
 import Shopify from './pages/Shopify'
 import Signup from './pages/Signup'
@@ -23,8 +24,8 @@ function App() {
       <Elements stripe={stripePromise}>
         <Router>
           <Switch>
-            <Route exact path="/login" component={Login} />
-            <Route exact path="/signup" component={Signup} />
+            <PublicRoute exact path="/login" restricted component={Login} />
+            <PublicRoute exact path="/signup" restricted component={Signup} />
             <Route exact path="/shopify" component={Shopify} />
             <PrivateRoute path="/" component={Home} />
 

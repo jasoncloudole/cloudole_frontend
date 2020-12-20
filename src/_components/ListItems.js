@@ -5,7 +5,6 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import LockIcon from '@material-ui/icons/Lock';
 import React from 'react';
-import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import { useCookies } from 'react-cookie';
 import { useHistory } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
@@ -22,7 +21,7 @@ export default function MainListItems () {
     enqueueSnackbar('Logged out!', { 
       variant: 'success',
     });
-    window.location.reload(false);
+    window.location.reload();
   }
   return (
   <div>
