@@ -15,7 +15,7 @@ import axios from 'axios'
 import {loadStripe} from '@stripe/stripe-js';
 
 axios.defaults.baseURL = 'https://us-central1-cloudole-2f23d.cloudfunctions.net/api'
-
+// axios.defaults.baseURL = 'http://localhost:5000/cloudole-2f23d/us-central1/api'
 const stripePromise = loadStripe('pk_test_dpjyOGsBaKQFXRYd5gTVoBYL00mtQJMKeo');
 
 function App() {

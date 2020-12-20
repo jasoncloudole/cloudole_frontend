@@ -63,6 +63,15 @@ const PaymentForm = ({ handleNext, handleBack, store }) => {
       setError(`Payment failed ${payload.error.message}`);
       setProcessing(false);
     } else {
+      const shopifyToken = Cookies.get('shopifyToken');
+      const shopifyShopName = Cookies.get('shopifyShopName');
+      await axios.post('/modifyInventory', {
+        shopifyShopName:shopifyShopName,
+        shopifyToken: shopifyToken,
+        location_id: 55771398306,
+        inventory_item_id: 38310447087778,
+        available_adjustment: -1
+      })
       setError(null);
       setProcessing(false);
       setSucceeded(true);
@@ -85,6 +94,15 @@ const PaymentForm = ({ handleNext, handleBack, store }) => {
       setError(`Payment failed ${payload.error.message}`);
       setProcessing(false);
     } else {
+      const shopifyToken = Cookies.get('shopifyToken');
+      const shopifyShopName = Cookies.get('shopifyShopName');
+      await axios.post('/modifyInventory', {
+        shopifyShopName:shopifyShopName,
+        shopifyToken: shopifyToken,
+        location_id: 55771398306,
+        inventory_item_id: 38310447087778,
+        available_adjustment: -1
+      })
       setError(null);
       setProcessing(false);
       setSucceeded(true);
