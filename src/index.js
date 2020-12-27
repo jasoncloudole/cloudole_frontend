@@ -4,6 +4,8 @@ import { StoreProvider, action, createStore } from 'easy-peasy';
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
 import App from './App';
+import Axios from 'axios';
+import Cookies from 'js-cookie';
 import { CookiesProvider } from 'react-cookie';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import React from 'react';
@@ -34,6 +36,26 @@ const store = createStore({
   setCustomerLocation: action((state, payload) => {
     state.customerLocation=payload;
   }),
+  cart:[],
+  addToCart: action((state, payload) => {
+    state.cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    const item = state.cart.find(o => o.location_id === payload.location_id && o.inventory_item_id === payload.inventory_item_id);
+    console.log(item)
+    if(item)
+      state.cart = [...state.cart.map(o => o.location_id === payload.location_id && o.inventory_item_id === payload.inventory_item_id ? payload : o)]
+    else
+      state.cart = [...state.cart, payload]
+    localStorage.setItem('cart', JSON.stringify(state.cart));
+    
+  }),
+  removeFromCart: action((state, payload) => {
+    state.cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    state.cart = [...state.cart.filter(o => o.location_id !== payload.location_id || o.inventory_item_id !== payload.inventory_item_id)]
+    localStorage.setItem('cart', JSON.stringify(state.cart));
+  }),
+  setShoppingCart: action((state) => {
+    state.cart = JSON.parse(localStorage.getItem("cart") || "[]");
+  })
 });
 
 ReactDOM.render(

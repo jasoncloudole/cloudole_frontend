@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
   },
 }));
-const PaymentForm = ({ handleNext, handleBack, store }) => {
+const PaymentForm = ({ handleNext, handleBack }) => {
   const stripe = useStripe();
   const elements = useElements();
   const classes = useStyles();
@@ -27,22 +27,22 @@ const PaymentForm = ({ handleNext, handleBack, store }) => {
   const [, setProcessing] = React.useState('');
   const [clientSecret, setClientSecret] = React.useState('');
   const [cards, setCards] = React.useState([]);
-  React.useEffect(() => {
-    // Create PaymentIntent as soon as the page loads
-    if (!clientSecret){
-      axios.post('/checkout', {
-        connectedAccount: store.connectedAccount,
-        customer_id: Cookies.get('stripeID'),
-        currency: 'cad',
-        price: parseFloat(store.product.price),
-        save_card: true,
-      }).then(res => {
-        setCards(res.data.paymentMethods.data);
-        setClientSecret(res.data.clientSecret);
-      });
-    }
+  // React.useEffect(() => {
+  //   // Create PaymentIntent as soon as the page loads
+  //   if (!clientSecret){
+  //     axios.post('/checkout', {
+  //       connectedAccount: store.connectedAccount,
+  //       customer_id: Cookies.get('stripeID'),
+  //       currency: 'cad',
+  //       price: parseFloat(store.product.price),
+  //       save_card: true,
+  //     }).then(res => {
+  //       setCards(res.data.paymentMethods.data);
+  //       setClientSecret(res.data.clientSecret);
+  //     });
+  //   }
 
-  }, [store.connectedAccount, clientSecret, store.product.price]);
+  // }, [store.connectedAccount, clientSecret, store.product.price]);
 
   const handleSubmit = async (event) => {
     // Block native form submission.

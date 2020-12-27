@@ -1,6 +1,12 @@
+import { Box, Button, Fab, InputBase, Popover } from '@material-ui/core';
+import PopupState, { bindPopover, bindTrigger } from 'material-ui-popup-state';
+import { useStoreActions, useStoreState } from 'easy-peasy';
+
+import AddIcon from '@material-ui/icons/Add';
 import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
+import { Check } from '@material-ui/icons';
 import Checkout from './Checkout';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Cookies from 'js-cookie';
@@ -16,6 +22,7 @@ import LocationOnIcon from '@material-ui/icons/LocationOn';
 import NotFoundSVG from '../_assets/around_the_world.svg';
 import Paper from '@material-ui/core/Paper';
 import React from 'react';
+import RemoveIcon from '@material-ui/icons/Remove';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import axios from 'axios'
@@ -25,7 +32,6 @@ import parse from 'autosuggest-highlight/parse';
 import throttle from 'lodash/throttle';
 import { useParams } from "react-router-dom";
 import { useSnackbar } from 'notistack';
-import { useStoreActions } from 'easy-peasy';
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -58,8 +64,20 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  gap:{
+  gap: {
     height: theme.spacing(2),
+  },
+  spinner: {
+    padding: '2px 4px',
+    display: 'flex',
+    alignItems: 'center',
+    width: '100%',
+  },
+  input: {
+    flex: 1,
+  },
+  iconButton: {
+    padding: 10,
   },
 }));
 
@@ -69,6 +87,8 @@ const SimpleMap = (props) => {
   const classes = useStyles();
   const [value, setValue] = React.useState(null);
   const setCustomerLocation = useStoreActions(actions => actions.setCustomerLocation);
+  const addToCart = useStoreActions(actions => actions.addToCart)
+  const cart = useStoreState(state => state.cart)
   // eslint-disable-next-line
   const [details, setDetails] = React.useState(null);
   const [inputValue, setInputValue] = React.useState('');
@@ -83,6 +103,7 @@ const SimpleMap = (props) => {
   const [loading, setLoading] = React.useState(false);
   const [checkout, setCheckout] = React.useState(false);
   const [markers, setMarkers] = React.useState([]);
+  const [itemQuantity, setQuantity] = React.useState(0);
   // const [shopList, setShopList] = React.useState([]);
   const handleApiLoaded = (map, maps) => {
     setMap(map);
@@ -127,6 +148,26 @@ const SimpleMap = (props) => {
       active = false;
     };
   }, [value, inputValue, fetchAutocomplete, autocompleteService]);
+
+  const addToShoppingCart = ({ inventory_item_id, price, title }, available, location_id, connectedAccount, popupState) => {
+    const item = cart.find(o => o.location_id === location_id && o.inventory_item_id === inventory_item_id) || {};
+    const quantity = item.quantity || 0;
+    console.log(location_id)
+    const payload = {
+      title,
+      available,
+      connectedAccount,
+      unit_price: parseFloat(price),
+      shopifyShopName: Cookies.get('shopifyShopName'),
+      location_id,
+      inventory_item_id,
+      quantity: (quantity + parseInt(itemQuantity)),
+      price: (quantity + parseInt(itemQuantity)) * parseFloat(price)
+    }
+    if (quantity + parseInt(itemQuantity) <= available)
+      addToCart(payload);
+    popupState.close();
+  }
 
   return (
     <Grid container spacing={2}>
@@ -182,7 +223,7 @@ const SimpleMap = (props) => {
                     position: place.geometry.location,
                     icon: { url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" }
                   })
-                  
+
                   for (let mark of markers) {
                     mark.setMap(null);
                   }
@@ -274,26 +315,87 @@ const SimpleMap = (props) => {
           {loading && <div className={classes.loadingContainer}>
             <CircularProgress className={classes.loading} />
           </div>}
-          {!checkout && !loading && storelist.length > 0 && <List className={classes.list}>{
-            storelist.map((store, key) => (
-              <ListItem key={key}>
-                <ListItemText primary={store.product.title} secondary={`$${store.product.price}`} />
-                <ListItemSecondaryAction>
-                  <IconButton edge="end" aria-label="delete" onClick={() => setCheckout(store)}>
-                    <AddShoppingCartIcon />
-                  </IconButton>
-                </ListItemSecondaryAction>
-              </ListItem>
-            ))
-          }</List>}
-          {checkout && 
-          <React.Fragment>
-            <div className={classes.gap}/>
-            <Paper variant='outlined' className={classes.paper}>
-              <Checkout store={checkout} onCancel={() => setCheckout(false)}/>
-            </Paper>
-          </React.Fragment>
-}
+          {!checkout && !loading && storelist.length > 0 &&
+            <List className={classes.list}>
+              {
+                storelist.map((store, key) => (
+                  <ListItem key={key}>
+                    <ListItemText primary={store.product.title} secondary={`$${store.product.price}`} />
+                    <ListItemSecondaryAction>
+                      <PopupState variant="popover" popupId={`${key}`}>
+                        {(popupState) => (
+                          <div>
+                            <IconButton edge="end" color="primary" aria-label="add" {...bindTrigger(popupState)}>
+                              <AddShoppingCartIcon />
+                            </IconButton>
+                            <Popover
+                              {...bindPopover(popupState)}
+                              onExited={() => setQuantity(0)}
+                              anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'center',
+                              }}
+                              transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'center',
+                              }}
+                            >
+                              <div>
+                                <Grid container alignItems='center'>
+                                  <Grid item className={classes.paper}>
+                                    <Typography variant='caption'>Avaliable: {store.available}</Typography>
+                                    <Paper className={classes.spinner}>
+                                      <IconButton
+                                        className={classes.iconButton}
+                                        disabled={itemQuantity === 0}
+                                        onClick={() => setQuantity(itemQuantity - 1)}
+                                        aria-label="minus">
+                                        <RemoveIcon />
+                                      </IconButton>
+                                      <InputBase
+                                        inputProps={{ style: { textAlign: 'center' } }}
+                                        className={classes.input}
+                                        value={itemQuantity}
+                                        onChange={(e) => setQuantity(e.target.value <= store.available ? e.target.value : store.available)}
+                                      />
+                                      <IconButton
+                                        className={classes.iconButton}
+                                        disabled={itemQuantity === store.available}
+                                        onClick={() => setQuantity(itemQuantity + 1)}
+                                        aria-label="plus">
+                                        <AddIcon />
+                                      </IconButton>
+                                    </Paper>
+                                  </Grid>
+                                  <Grid item className={classes.paper}>
+                                    <Fab
+                                      disabled={itemQuantity === 0}
+                                      onClick={() => addToShoppingCart(store.product, store.available, store.locationId, store.connectedAccount, popupState)}
+                                      color="primary">
+                                      <Check />
+                                    </Fab>
+                                  </Grid>
+                                </Grid>
+                              </div>
+                            </Popover>
+                          </div>
+                        )}
+                      </PopupState>
+
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                ))
+              }
+            </List>
+          }
+          {checkout &&
+            <React.Fragment>
+              <div className={classes.gap} />
+              <Paper variant='outlined' className={classes.paper}>
+                <Checkout store={checkout} onCancel={() => setCheckout(false)} />
+              </Paper>
+            </React.Fragment>
+          }
         </Paper>
       </Grid>
     </Grid>

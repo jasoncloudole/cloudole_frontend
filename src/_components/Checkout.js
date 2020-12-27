@@ -1,5 +1,6 @@
 import AddressForm from './AddressForm';
 import Button from '@material-ui/core/Button';
+import { Paper } from '@material-ui/core';
 import PaymentForm from './PaymentForm';
 import React from 'react';
 import Step from '@material-ui/core/Step';
@@ -9,6 +10,10 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
+  root: {
+    width: 500,
+    padding: theme.spacing(4),
+  },
   layout: {
     width: 'auto',
     marginLeft: theme.spacing(2),
@@ -61,14 +66,14 @@ export default function Checkout(props) {
       case 0:
         return <AddressForm handleNext={handleNext} handleBack={props.onCancel}/>;
       case 1:
-        return <PaymentForm  handleNext={handleNext} handleBack={handleBack} store={props.store}/>;
+        return <PaymentForm  handleNext={handleNext} handleBack={handleBack} />;
       default:
         throw new Error('Unknown step');
     }
   }
 
   return (
-    <React.Fragment>
+    <div className={classes.root}>
         <Stepper activeStep={activeStep} className={classes.stepper}>
         {steps.map((label) => (
             <Step key={label}>
@@ -96,6 +101,6 @@ export default function Checkout(props) {
                 </React.Fragment>
             )}
         </React.Fragment>
-    </React.Fragment>
+    </div>
   );
 }
