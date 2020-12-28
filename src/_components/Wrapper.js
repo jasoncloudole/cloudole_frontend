@@ -135,7 +135,7 @@ export default function Dashboard(props) {
   const setShoppingCart = useStoreActions(actions=>actions.setShoppingCart)
   const cart = useStoreState(state => state.cart)
   React.useEffect(() => {
-    if (cart.length === 0 && localStorage.getItem("cart") !== '[]') {
+    if (cart.length === 0 && localStorage.getItem("cart") && localStorage.getItem("cart") !== '[]') {
         setShoppingCart();
     }
 }, [cart])

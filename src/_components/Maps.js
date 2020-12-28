@@ -149,11 +149,12 @@ const SimpleMap = (props) => {
     };
   }, [value, inputValue, fetchAutocomplete, autocompleteService]);
 
-  const addToShoppingCart = ({ inventory_item_id, price, title }, available, location_id, connectedAccount, popupState) => {
+  const addToShoppingCart = ({ inventory_item_id, price, title, barcode }, available, location_id, connectedAccount, popupState) => {
     const item = cart.find(o => o.location_id === location_id && o.inventory_item_id === inventory_item_id) || {};
     const quantity = item.quantity || 0;
     console.log(location_id)
     const payload = {
+      barcode,
       title,
       available,
       connectedAccount,
