@@ -1,5 +1,5 @@
 import { Add, Delete, Remove } from '@material-ui/icons';
-import { Button, Grid, IconButton, InputBase, List, ListItemSecondaryAction, Paper, ThemeProvider, Typography, makeStyles } from '@material-ui/core';
+import { Button, Grid, IconButton, InputBase, List, ListItemSecondaryAction, Paper, Typography, makeStyles } from '@material-ui/core';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
 import Checkout from './Checkout';
@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ShoppingCart() {
     const classes = useStyles();
-    const cart = useStoreState(state => state.cart)
+    const cart = useStoreState(state => state.cart);
     const addToCart = useStoreActions(actions => actions.addToCart)
     const removeFromCart = useStoreActions(actions => actions.removeFromCart)
     // eslint-disable-next-line

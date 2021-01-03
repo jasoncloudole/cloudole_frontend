@@ -1,4 +1,4 @@
-import { Box, Button, Fab, InputBase, Popover } from '@material-ui/core';
+import { Fab, InputBase, Popover } from '@material-ui/core';
 import PopupState, { bindPopover, bindTrigger } from 'material-ui-popup-state';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
@@ -149,23 +149,23 @@ const SimpleMap = (props) => {
     };
   }, [value, inputValue, fetchAutocomplete, autocompleteService]);
 
-  const addToShoppingCart = ({ inventory_item_id, price, title, barcode }, available, location_id, connectedAccount, popupState) => {
-    const item = cart.find(o => o.location_id === location_id && o.inventory_item_id === inventory_item_id) || {};
+  const addToShoppingCart = (store, popupState) => {
+    const item = cart.find(o => o.location_id === store.location_id && o.inventory_item_id === store.product.inventory_item_id) || {};
     const quantity = item.quantity || 0;
-    console.log(location_id)
     const payload = {
-      barcode,
-      title,
-      available,
-      connectedAccount,
-      unit_price: parseFloat(price),
+      barcode:store.barcode,
+      title:store.product.title,
+      email:store.email,
+      available:store.available,
+      connectedAccount:store.connectedAccount,
+      unit_price: parseFloat(store.product.price),
       shopifyShopName: Cookies.get('shopifyShopName'),
-      location_id,
-      inventory_item_id,
+      location_id:store.locationId,
+      inventory_item_id:store.product.inventory_item_id,
       quantity: (quantity + parseInt(itemQuantity)),
-      price: (quantity + parseInt(itemQuantity)) * parseFloat(price)
+      price: (quantity + parseInt(itemQuantity)) * parseFloat(store.product.price)
     }
-    if (quantity + parseInt(itemQuantity) <= available)
+    if (quantity + parseInt(itemQuantity) <= store.available)
       addToCart(payload);
     popupState.close();
   }
@@ -371,7 +371,7 @@ const SimpleMap = (props) => {
                                   <Grid item className={classes.paper}>
                                     <Fab
                                       disabled={itemQuantity === 0}
-                                      onClick={() => addToShoppingCart(store.product, store.available, store.locationId, store.connectedAccount, popupState)}
+                                      onClick={() => addToShoppingCart(store, popupState)}
                                       color="primary">
                                       <Check />
                                     </Fab>

@@ -4,8 +4,6 @@ import { StoreProvider, action, createStore } from 'easy-peasy';
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
 import App from './App';
-import Axios from 'axios';
-import Cookies from 'js-cookie';
 import { CookiesProvider } from 'react-cookie';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import React from 'react';
@@ -35,6 +33,16 @@ const store = createStore({
   customerLocation: {},
   setCustomerLocation: action((state, payload) => {
     state.customerLocation=payload;
+  }),
+  currentLocation:[],
+  setCurrentLocation: action((state, payload) => {
+    state.currentLocation=payload;
+    state.cart = state.cart.map(item => ({...item, targetLocation:payload}));
+    console.log(state.cart);
+  }),
+  locations:[],
+  setLocations: action((state, payload) => {
+    state.locations=payload;
   }),
   cart:[],
   addToCart: action((state, payload) => {

@@ -55,7 +55,7 @@ export default function Dashboard() {
         setAccountLink(response.data);
       });
     }
-  },[accountLink]);
+  },[accountLink, setAccountLink]);
   return (
     <Grid container spacing={3}>
       {accountLink.isSetup &&       

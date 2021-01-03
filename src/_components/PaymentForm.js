@@ -1,9 +1,11 @@
-import { Button, List, ListItem, ListItemSecondaryAction, ListItemText, Typography, makeStyles } from '@material-ui/core';
+import { Button, CircularProgress, List, ListItem, ListItemSecondaryAction, ListItemText, Typography, makeStyles } from '@material-ui/core';
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
 
 import Cookies from 'js-cookie';
+import OrderDetails from './OrderDetails';
 import React from 'react';
 import axios from 'axios';
+import { useStoreState } from 'easy-peasy';
 
 const useStyles = makeStyles((theme) => ({
   buttons: {
@@ -17,32 +19,49 @@ const useStyles = makeStyles((theme) => ({
   list: {
     width: '100%',
   },
+  card: {
+    padding: theme.spacing(2),
+    marginBottom: theme.spacing(2),
+  },
+  loadingContainer: {
+    display: 'flex',
+    width: "100%",
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 }));
 const PaymentForm = ({ handleNext, handleBack }) => {
   const stripe = useStripe();
   const elements = useElements();
   const classes = useStyles();
+  const cart = useStoreState(state => state.cart);
   const [, setSucceeded] = React.useState(false);
   const [, setError] = React.useState(null);
   const [, setProcessing] = React.useState('');
   const [clientSecret, setClientSecret] = React.useState('');
   const [cards, setCards] = React.useState([]);
-  // React.useEffect(() => {
-  //   // Create PaymentIntent as soon as the page loads
-  //   if (!clientSecret){
-  //     axios.post('/checkout', {
-  //       connectedAccount: store.connectedAccount,
-  //       customer_id: Cookies.get('stripeID'),
-  //       currency: 'cad',
-  //       price: parseFloat(store.product.price),
-  //       save_card: true,
-  //     }).then(res => {
-  //       setCards(res.data.paymentMethods.data);
-  //       setClientSecret(res.data.clientSecret);
-  //     });
-  //   }
+  const [price, setPrice] = React.useState(0);
+  const [orders, setOrders] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
 
-  // }, [store.connectedAccount, clientSecret, store.product.price]);
+  React.useEffect(() => {
+    // Create PaymentIntent as soon as the page loads
+    if (!clientSecret) {
+      setLoading(true);
+      axios.post('/checkout', {
+        orders: cart,
+        customer_id: Cookies.get('stripeID'),
+        currency: 'cad',
+      }).then(res => {
+        setLoading(false);
+        setPrice(res.data.totalFee);
+        setOrders(res.data.transactionDetail.map((item, id) => ({ ...item, id, name: item.product.title })));
+        setCards(res.data.paymentMethods.data);
+        setClientSecret(res.data.clientSecret);
+      }).catch(() => setLoading(false));
+    }
+
+  }, [clientSecret, cart]);
 
   const handleSubmit = async (event) => {
     // Block native form submission.
@@ -63,14 +82,9 @@ const PaymentForm = ({ handleNext, handleBack }) => {
       setError(`Payment failed ${payload.error.message}`);
       setProcessing(false);
     } else {
-      const shopifyToken = Cookies.get('shopifyToken');
-      const shopifyShopName = Cookies.get('shopifyShopName');
-      await axios.post('/modifyInventory', {
-        shopifyShopName:shopifyShopName,
-        shopifyToken: shopifyToken,
-        location_id: 55771398306,
-        inventory_item_id: 38310447087778,
-        available_adjustment: -1
+      await axios.post('/createOrder', {
+        orders: cart,
+        buyerEmail: Cookies.get('email'),
       })
       setError(null);
       setProcessing(false);
@@ -94,14 +108,9 @@ const PaymentForm = ({ handleNext, handleBack }) => {
       setError(`Payment failed ${payload.error.message}`);
       setProcessing(false);
     } else {
-      const shopifyToken = Cookies.get('shopifyToken');
-      const shopifyShopName = Cookies.get('shopifyShopName');
-      await axios.post('/modifyInventory', {
-        shopifyShopName:shopifyShopName,
-        shopifyToken: shopifyToken,
-        location_id: 55771398306,
-        inventory_item_id: 38310447087778,
-        available_adjustment: -1
+      await axios.post('/createOrder', {
+        orders: cart,
+        buyerEmail: Cookies.get('email'),
       })
       setError(null);
       setProcessing(false);
@@ -109,11 +118,17 @@ const PaymentForm = ({ handleNext, handleBack }) => {
       handleNext();
     }
   };
-
   return (
     <React.Fragment>
-      {cards && <Typography variant="body1" gutterBottom style={{ fontWeight: 'bold' }} >Your Cards</Typography>}
-      {cards &&
+      {loading && <div className={classes.loadingContainer}>
+        <CircularProgress className={classes.loading} />
+      </div>}
+      {!loading && orders.length > 0 && <>
+      <OrderDetails orders={orders} />
+      <Typography variant="h5" gutterBottom style={{ fontWeight: 'bold' }} >Total: {price} cad</Typography>
+      </>}
+      {!loading && cards && <Typography variant="body1" gutterBottom style={{ fontWeight: 'bold' }} >Pay With Saved Cards</Typography>}
+      {!loading && cards &&
         <List className={classes.list}>{
           cards.map((card, key) => (
             <ListItem key={key}>
@@ -128,21 +143,26 @@ const PaymentForm = ({ handleNext, handleBack }) => {
         }
         </List>
       }
-      <Typography variant="body1" gutterBottom style={{ fontWeight: 'bold' }} >New Card</Typography>
-      <CardElement />
-      <div className={classes.buttons}>
-        <Button onClick={handleBack} className={classes.button}>
-          Back
+      {!loading && <>
+        <Typography variant="body1" gutterBottom style={{ fontWeight: 'bold' }} >Pay With New Card</Typography>
+        <CardElement />
+        <div className={classes.buttons}>
+          <Button onClick={handleBack} className={classes.button}>
+            Back
         </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleSubmit}
-          className={classes.button}
-        >
-          Pay
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+            className={classes.button}
+          >
+            Pay
         </Button>
-      </div>
+        </div>
+      </>}
+
+
+
     </React.Fragment>
 
   );

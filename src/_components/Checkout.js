@@ -1,6 +1,5 @@
 import AddressForm from './AddressForm';
 import Button from '@material-ui/core/Button';
-import { Paper } from '@material-ui/core';
 import PaymentForm from './PaymentForm';
 import React from 'react';
 import Step from '@material-ui/core/Step';
@@ -13,6 +12,7 @@ const useStyles = makeStyles((theme) => ({
   root: {
     width: 500,
     padding: theme.spacing(4),
+    height: '100vh',
   },
   layout: {
     width: 'auto',

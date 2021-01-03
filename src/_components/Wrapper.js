@@ -111,8 +111,12 @@ const useStyles = makeStyles((theme) => ({
     overflow: 'auto',
     flexDirection: 'column',
   },
-  fixedHeight: {
-    height: 240,
+  loadingContainer: {
+    display: 'flex',
+    width: "100%",
+    height: "100%",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   notification: {
     marginRight: theme.spacing(2),
@@ -138,7 +142,7 @@ export default function Dashboard(props) {
     if (cart.length === 0 && localStorage.getItem("cart") && localStorage.getItem("cart") !== '[]') {
         setShoppingCart();
     }
-}, [cart])
+}, [cart, setShoppingCart])
   const handleDrawerOpen = () => {
     setOpen(true);
   };
