@@ -1,4 +1,4 @@
-import { Breadcrumbs, Button, Divider, Link, Step, StepLabel, Stepper, Typography } from '@material-ui/core';
+import { Breadcrumbs, Button, Divider, Link, Step, StepLabel, Stepper, TextField, Typography } from '@material-ui/core';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 
 import Axios from 'axios';
@@ -30,22 +30,22 @@ const groupBy = (xs, key) => {
 };
 export default function Dashboard() {
     const classes = useStyles();
-    const orderHistory = useStoreState(state => state.orderHistory);
-    const setOrderHistory = useStoreActions(action => action.setOrderHistory);
+    const sellHistory = useStoreState(state => state.sellHistory);
+    const setSellHistory = useStoreActions(action => action.setSellHistory);
     const [details, setDetails] = React.useState({});
     React.useEffect(() => {
-        if (!orderHistory) {
+        if (!sellHistory) {
             Axios.get('/getOrder', {
                 headers: {
                     email: Cookies.get('email'),
                 }
             }).then(function (response) {
                 if (response.data) {
-                    setOrderHistory(groupBy(response.data.orderList.filter(o => o.buyer), 'orderId'));
+                    setSellHistory(groupBy(response.data.orderList.filter(o => !o.buyer), 'orderId'));
                 }
             });
         }
-    }, [orderHistory, setOrderHistory]);
+    }, [sellHistory, setSellHistory]);
     return (
         <Grid container spacing={3}>
             <Grid item xs={12}>
@@ -53,14 +53,14 @@ export default function Dashboard() {
                     <Link color="inherit" href="/">
                         Dashboard
                 </Link>
-                    <Typography color="textPrimary">Order History</Typography>
+                    <Typography color="textPrimary">Sell</Typography>
                 </Breadcrumbs>
             </Grid>
             <Grid item xs={12}>
-                <Title>Order History</Title>
+                <Title>Sell</Title>
             </Grid>
             <Grid item xs={12}>
-                {orderHistory && Object.values(orderHistory).map(orders => {
+                {sellHistory && Object.values(sellHistory).map(orders => {
                     const total = orders.reduce((rv, x) => rv + x.deliveryFee + x.price + x.stripeTransactionFee, 0);
                     const orderId = orders[0].orderId;
                     const orderPlaced = new Date(orders[0].timestamp[0]);
@@ -121,7 +121,8 @@ export default function Dashboard() {
                                     <Typography >Order placed:</Typography>
                                     <Typography variant='h6' color="textSecondary">{orderPlaced.toDateString()}</Typography>
                                     <Typography>CA${total.toFixed(2)}</Typography>
-                                    <Button variant='contained' color='primary' className={classes.button}>Track Item</Button>
+                                    <TextField label='password'></TextField>
+                                    <Button variant='contained' color='primary' className={classes.button}>Confirm</Button>
                                 </Grid>
                             </Grid>
                         </Paper>

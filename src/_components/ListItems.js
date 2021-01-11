@@ -37,6 +37,12 @@ export default function MainListItems () {
       </ListItemIcon>
       <ListItemText primary="Order History" />
     </ListItem>
+    <ListItem button onClick={() => history.push('/sell')}>
+      <ListItemIcon>
+        <LayersIcon />
+      </ListItemIcon>
+      <ListItemText primary="Sell" />
+    </ListItem>
     <ListItem button onClick={logout} >
       <ListItemIcon>
         <LockIcon />

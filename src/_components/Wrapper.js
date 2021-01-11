@@ -15,7 +15,7 @@ import List from '@material-ui/core/List';
 import MainListItems from './ListItems';
 import MenuIcon from '@material-ui/icons/Menu';
 import NotFoundSVG from '../_assets/undraw_No_data_re_kwbl.svg';
-import NotificationsIcon from '@material-ui/icons/Notifications';
+// import NotificationsIcon from '@material-ui/icons/Notifications';
 import React from 'react';
 import { ShoppingCart } from '@material-ui/icons';
 import ShoppingCartComponent from './ShoppingCart'
@@ -192,11 +192,11 @@ export default function Dashboard(props) {
               <ShoppingCart />
             </Badge>
           </IconButton>
-          <IconButton color="inherit" className={classes.notification}>
+          {/* <IconButton color="inherit" className={classes.notification}>
             <Badge badgeContent={4} color="secondary">
               <NotificationsIcon />
             </Badge>
-          </IconButton>
+          </IconButton> */}
           <Avatar color="inherit">J</Avatar>
         </Toolbar>
       </AppBar>

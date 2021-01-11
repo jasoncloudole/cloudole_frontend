@@ -81,6 +81,10 @@ const store = createStore({
   setOrderHistory: action((state, payload) => {
     state.orderHistory = payload || null;
   }),
+  sellHistory:null,
+  setSellHistory: action((state, payload) => {
+    state.sellHistory = payload || null;
+  }),
 });
 
 ReactDOM.render(
