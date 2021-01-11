@@ -63,6 +63,14 @@ const useStyles = makeStyles((theme) => ({
     left: -3,
     zIndex: 1,
   },
+  buttonProgress: {
+    color: green[500],
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12,
+  },
 }));
 
 export default function SignIn(props) {
@@ -157,6 +165,7 @@ export default function SignIn(props) {
                 onChange = {(event) => onChangeHandler(event)}
                 autoComplete="current-password"
             />
+            <div className={classes.wrapper}>
             <Button
                 type="submit"
                 fullWidth
@@ -168,6 +177,9 @@ export default function SignIn(props) {
             >
                 Sign In
             </Button>
+            {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
+            </div>
+
             </form>
             <Typography variant="body2" color="textSecondary" align="center">
                 {error}

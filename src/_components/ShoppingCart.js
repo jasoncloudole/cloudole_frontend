@@ -61,14 +61,14 @@ export default function ShoppingCart() {
     }
     return (
         <List className={classes.list}>
-            <Typography variant='overline' gutterBottom className={classes.title}>
+            <Typography variant="h5" gutterBottom className={classes.title}>
                 Shopping Cart
             </Typography>
-            {cart.map(data =>
-                <ListItem>
+            {cart.map((data, id) =>
+                <ListItem key={id}>
                     <Grid container spacing={2}>
                         <Grid item xs={4} >
-                            <Paper className={classes.spinner}>
+                            <Paper className={classes.spinner} variant='outlined'>
                                 <IconButton
                                     className={classes.iconButton}
                                     onClick={(e) => editShoppingCart(data, data.quantity - 1)}

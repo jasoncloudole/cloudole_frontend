@@ -24,7 +24,7 @@ export default function OutlinedCard({ orders }) {
         <React.Fragment>
             {
                 orders.map(order =>
-                    <Card className={classes.root} variant="outlined">
+                    <Card className={classes.root} variant="outlined" key={order.orderId}>
                         <Typography className={classes.title} color="textSecondary" gutterBottom>
                             {order.email}
                         </Typography>

@@ -321,7 +321,13 @@ const SimpleMap = (props) => {
               {
                 storelist.map((store, key) => (
                   <ListItem key={key}>
-                    <ListItemText primary={store.product.title} secondary={`$${store.product.price}`} />
+                    <ListItemText primary={store.product.title} secondary={
+                        <Typography variant="body2" color='textSecondary' component="p">
+                            Unit Price: {store.product.price} cad
+                            <br />
+                            Commute Fee: {store.commuteFee} cad
+                        </Typography>
+                    } />
                     <ListItemSecondaryAction>
                       <PopupState variant="popover" popupId={`${key}`}>
                         {(popupState) => (

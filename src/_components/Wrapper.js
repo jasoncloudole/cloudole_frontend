@@ -137,7 +137,12 @@ export default function Dashboard(props) {
   const [open, setOpen] = React.useState(true);
   const [drawer, setDrawer] = React.useState(false);
   const setShoppingCart = useStoreActions(actions=>actions.setShoppingCart)
+  const clearShoppingCart = useStoreActions(actions=>actions.clearShoppingCart)
   const cart = useStoreState(state => state.cart)
+  const setOrderConfirmed = useStoreActions(action => action.setOrderConfirmed);
+  const setOrders = useStoreActions(action => action.setOrders);
+
+  const orderConfirmed = useStoreState(state => state.orderConfirmed)
   React.useEffect(() => {
     if (cart.length === 0 && localStorage.getItem("cart") && localStorage.getItem("cart") !== '[]') {
         setShoppingCart();
@@ -151,6 +156,15 @@ export default function Dashboard(props) {
   };
   const handleShoppingCart = () => {
     setDrawer(true);
+  }
+  const handleShoppingCartClose = () => {
+    setDrawer(false);
+    console.log(orderConfirmed);
+    if (orderConfirmed){
+      clearShoppingCart();
+      setOrderConfirmed(false);
+      setOrders([]);
+    }
   }
   return (
     <div className={classes.root}>
@@ -189,14 +203,14 @@ export default function Dashboard(props) {
       <SwipeableDrawer
         anchor='right'
         open={drawer}
-        onClose={() => setDrawer(false)}
-        onOpen={() => setDrawer(true)}
+        onClose={handleShoppingCartClose}
+        onOpen={handleShoppingCart}
       >
       {cart.length === 0 && <div className={classes.imageContainer}>
         <img src={NotFoundSVG} alt="icon" className={classes.image} />
         <Typography variant="overline" color="primary" display="block">
-          NO Item in your cart
-          </Typography>
+          No Items in your cart
+        </Typography>
       </div>}
       {cart.length !== 0 && <ShoppingCartComponent />}
       </SwipeableDrawer>

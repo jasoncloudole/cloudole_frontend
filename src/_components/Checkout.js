@@ -1,3 +1,5 @@
+import { useStoreActions, useStoreState } from 'easy-peasy';
+
 import AddressForm from './AddressForm';
 import Button from '@material-ui/core/Button';
 import PaymentForm from './PaymentForm';
@@ -52,7 +54,10 @@ const steps = ['Shipping address', 'Payment details'];
 export default function Checkout(props) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
-
+  const clearShoppingCart = useStoreActions(action => action.clearShoppingCart);
+  const setOrders = useStoreActions(action => action.setOrders);
+  const setOrderConfirmed = useStoreActions(action => action.setOrderConfirmed);
+  const orders = useStoreState(state => state.orders);
   const handleNext = () => {
     setActiveStep(activeStep + 1);
   };
@@ -60,6 +65,13 @@ export default function Checkout(props) {
   const handleBack = () => {
     setActiveStep(activeStep - 1);
   };
+
+  const handleDone = () => {
+    clearShoppingCart();
+    setOrderConfirmed(false);
+    setOrders([]);
+    props.onCancel();
+  }
 
   function getStepContent(step) {
     switch (step) {
@@ -84,14 +96,14 @@ export default function Checkout(props) {
         <React.Fragment>
             {activeStep === steps.length ? (
                 <React.Fragment>
-                <Typography variant="h5" gutterBottom>
+                    <Typography variant="h5" gutterBottom>
                     Thank you for your order.
-                </Typography>
-                <Typography variant="subtitle1">
-                    Your order number is #2001539. We have emailed your order confirmation, and will
-                    send you an update when your order has shipped.
-                </Typography>
-                <Button onClick={props.onCancel} className={classes.button}>
+                  </Typography>
+                  <Typography variant="subtitle1">
+                      Your order number is #{orders.length?orders[0].orderId:''}. We have emailed your order confirmation, and will
+                      send you an update when your order has shipped.
+                  </Typography>
+                <Button onClick={handleDone} fullWidth variant='contained' className={classes.button}>
                   Done
                 </Button>
                 </React.Fragment>

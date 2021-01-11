@@ -12,13 +12,13 @@ import { SnackbarProvider } from 'notistack';
 
 const theme = createMuiTheme({
   typography: {
-    body1:{
+    body1: {
       fontSize: '0.875rem',
     }
   },
   overrides: {
-    MuiListItemText:{
-      primary:{
+    MuiListItemText: {
+      primary: {
         fontWeight: 'bold'
       }
     }
@@ -26,35 +26,35 @@ const theme = createMuiTheme({
 });
 
 const store = createStore({
-  stripeAccountLinks : {},
+  stripeAccountLinks: {},
   setStripeAccountLinks: action((state, payload) => {
-    state.stripeAccountLinks=payload;
+    state.stripeAccountLinks = payload;
   }),
   customerLocation: {},
   setCustomerLocation: action((state, payload) => {
-    state.customerLocation=payload;
+    state.customerLocation = payload;
   }),
-  currentLocation:[],
+  currentLocation: [],
   setCurrentLocation: action((state, payload) => {
-    state.currentLocation=payload;
-    state.cart = state.cart.map(item => ({...item, targetLocation:payload}));
+    state.currentLocation = payload;
+    state.cart = state.cart.map(item => ({ ...item, targetLocation: payload }));
     console.log(state.cart);
   }),
-  locations:[],
+  locations: [],
   setLocations: action((state, payload) => {
-    state.locations=payload;
+    state.locations = payload;
   }),
-  cart:[],
+  cart: [],
   addToCart: action((state, payload) => {
     state.cart = JSON.parse(localStorage.getItem("cart") || "[]");
     const item = state.cart.find(o => o.location_id === payload.location_id && o.inventory_item_id === payload.inventory_item_id);
     console.log(item)
-    if(item)
+    if (item)
       state.cart = [...state.cart.map(o => o.location_id === payload.location_id && o.inventory_item_id === payload.inventory_item_id ? payload : o)]
     else
       state.cart = [...state.cart, payload]
     localStorage.setItem('cart', JSON.stringify(state.cart));
-    
+
   }),
   removeFromCart: action((state, payload) => {
     state.cart = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -63,7 +63,24 @@ const store = createStore({
   }),
   setShoppingCart: action((state) => {
     state.cart = JSON.parse(localStorage.getItem("cart") || "[]");
-  })
+  }),
+  clearShoppingCart: action((state) => {
+    state.cart = [];
+    localStorage.setItem('cart', JSON.stringify(state.cart));
+  }),
+  orders: [],
+  setOrders: action((state, payload) => {
+    console.log(payload);
+    state.orders = payload || [];
+  }),
+  orderConfirmed: false,
+  setOrderConfirmed: action((state, payload) => {
+    state.orderConfirmed = payload || false;
+  }),
+  orderHistory:null,
+  setOrderHistory: action((state, payload) => {
+    state.orderHistory = payload || null;
+  }),
 });
 
 ReactDOM.render(
