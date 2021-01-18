@@ -1,12 +1,15 @@
-import React, {useState, useEffect} from 'react';
-import Cookies from 'js-cookie';
 import { DataGrid, GridOverlay } from '@material-ui/data-grid';
-import axios from 'axios'
-import Barcode from 'react-barcode'
-import { useSnackbar } from 'notistack';
-import LinearProgress from '@material-ui/core/LinearProgress';
+import React, {useEffect, useState} from 'react';
 import { useHistory, useRouteMatch } from "react-router-dom";
+
+import Barcode from 'react-barcode'
 import Button from '@material-ui/core/Button';
+import Cookies from 'js-cookie';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import ProductDetailsComponent from './ProductDetails';
+import { SwipeableDrawer } from '@material-ui/core';
+import axios from 'axios'
+import { useSnackbar } from 'notistack';
 
 function CustomLoadingOverlay() {
   return (
@@ -23,8 +26,10 @@ export default function Products() {
   let { path, url } = useRouteMatch();
   const history = useHistory();
   const { enqueueSnackbar } = useSnackbar();
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [productDetails, setProductDetails] = useState({});
+  const [open, setOpen] = useState(false)
   const columns = [
     { field: 'variant_id', hide: true },
     {
@@ -67,25 +72,31 @@ export default function Products() {
     },
   ]
   useEffect(() => {
-    setLoading(true);
-    axios.get('/productList', {headers:{
-      shopifyToken: Cookies.get('shopifyToken'),
-      shopifyShopName: Cookies.get('shopifyShopName')
-    }}).then(function (response) {
-      setProducts(Object.values(response.data).map((row, id) => ({...row, id:id})));
-      enqueueSnackbar('Loaded products!', { 
-          variant: 'success',
+    if (!products){
+      setLoading(true);
+      axios.get('/productList', {headers:{
+        shopifyToken: Cookies.get('shopifyToken'),
+        shopifyShopName: Cookies.get('shopifyShopName'),
+        email: Cookies.get('email')
+      }}).then(function (response) {
+        setProducts(Object.values(response.data).map((row, id) => ({...row, id:id})));
+        enqueueSnackbar('Loaded products!', { 
+            variant: 'success',
+        });
+        setLoading(false);
+      })
+      .catch(function () {
+        setLoading(false);
+        enqueueSnackbar('Server error, unable to load products', { 
+            variant: 'error',
+        });
       });
-      setLoading(false);
-    })
-    .catch(function () {
-      setLoading(false);
-      enqueueSnackbar('Server error, unable to load products', { 
-          variant: 'error',
-      });
-    });
-  },[enqueueSnackbar]);
+    }
+
+  },[enqueueSnackbar, products]);
   const handleRowClick = (RowParams) =>{
+    setProductDetails(RowParams.data);
+    setOpen(true);
     // history.push(`/product/${RowParams.data.barcode}`);
   }
   return (
@@ -97,10 +108,17 @@ export default function Products() {
           }}
           loading={loading}
           columns={columns}
-          rows={products}
+          rows={products || []}
           onRowClick={handleRowClick}
         />
       </div>
+      <SwipeableDrawer
+        anchor='right'
+        open={open}
+        onClose={() => setOpen(false)}
+      >
+        <ProductDetailsComponent {...productDetails} setOpen={setOpen} setProducts={setProducts}/>
+      </SwipeableDrawer>
     </React.Fragment>
   );
 }

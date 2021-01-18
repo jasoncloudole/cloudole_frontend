@@ -9,6 +9,7 @@ import Paper from '@material-ui/core/Paper';
 import React from 'react';
 import Title from './Title';
 import { makeStyles } from '@material-ui/core/styles';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -32,6 +33,8 @@ export default function Dashboard() {
     const classes = useStyles();
     const sellHistory = useStoreState(state => state.sellHistory);
     const setSellHistory = useStoreActions(action => action.setSellHistory);
+    const { enqueueSnackbar } = useSnackbar();
+
     const [details, setDetails] = React.useState({});
     React.useEffect(() => {
         if (!sellHistory) {
@@ -46,6 +49,25 @@ export default function Dashboard() {
             });
         }
     }, [sellHistory, setSellHistory]);
+    const [password, setPassword] = React.useState(null);
+    const receivePayment = (amount) => async () => {
+        try {
+            await Axios.post('/receivePayment', {
+                email: Cookies.get('email'),
+                currency: 'cad',
+                amount,
+                password
+            })
+            enqueueSnackbar('Payment Recieved!', { 
+                variant: 'success',
+            });
+        } catch (error) {
+            console.log(error);
+            enqueueSnackbar('Wrong Password!', { 
+                variant: 'error',
+            });
+        }
+    }
     return (
         <Grid container spacing={3}>
             <Grid item xs={12}>
@@ -121,8 +143,9 @@ export default function Dashboard() {
                                     <Typography >Order placed:</Typography>
                                     <Typography variant='h6' color="textSecondary">{orderPlaced.toDateString()}</Typography>
                                     <Typography>CA${total.toFixed(2)}</Typography>
-                                    <TextField label='password'></TextField>
-                                    <Button variant='contained' color='primary' className={classes.button}>Confirm</Button>
+
+                                    <TextField label='password' value={password} onChange={(e) => setPassword(e.target.value)}></TextField>
+                                    <Button variant='contained' color='primary' className={classes.button} onClick={receivePayment(parseInt(total * 100))}>Confirm</Button>
                                 </Grid>
                             </Grid>
                         </Paper>

@@ -41,12 +41,20 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: -12,
   },
 }));
-
+const groupBy = (xs, key) => {
+  return xs.reduce((rv, x) => {
+      (rv[x[key]] = rv[x[key]] || []).push(x);
+      return rv;
+  }, {});
+};
 export default function Dashboard() {
   const classes = useStyles();
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
   const setAccountLink = useStoreActions(actions => actions.setStripeAccountLinks);
-  const accountLink = useStoreState(state => state.stripeAccountLinks)
+  const accountLink = useStoreState(state => state.stripeAccountLinks) ;
+  const sellHistory = useStoreState(state => state.sellHistory);
+  const setSellHistory = useStoreActions(action => action.setSellHistory);
+  const [data, setData] = React.useState([]);
   React.useEffect(() => {
     if(!accountLink.url){
       Axios.post('/setupConnectedAccount', {
@@ -55,19 +63,36 @@ export default function Dashboard() {
         setAccountLink(response.data);
       });
     }
-  },[accountLink, setAccountLink]);
+    if (!sellHistory) {
+      Axios.get('/getOrder', {
+          headers: {
+              email: Cookies.get('email'),
+          }
+      }).then(function (response) {
+          if (response.data) {
+              setSellHistory(groupBy(response.data.orderList.filter(o => !o.buyer), 'orderId'));
+          }
+      });
+  } else if (data.length === 0) {
+    setData(Object.values(sellHistory).map(orders => ({
+      amount : orders.reduce((rv, x) => rv + x.deliveryFee + x.price + x.stripeTransactionFee, 0),
+      time : new Date(orders[0].timestamp[0]).toDateString()
+    })))
+  }
+  },[accountLink, setAccountLink, sellHistory, setSellHistory,data.length]);
+
   return (
     <Grid container spacing={3}>
       {accountLink.isSetup &&       
       <Grid item xs={12} md={8} lg={9}>
         <Paper className={fixedHeightPaper}>
-          <Chart />
+          <Chart data={data} />
         </Paper>
       </Grid>}
       {accountLink.isSetup && 
       <Grid item xs={12} md={4} lg={3}>
         <Paper className={fixedHeightPaper}>
-          <TotalEarned/>
+          <TotalEarned  data={data}/>
         </Paper>
       </Grid>}
       {!accountLink.isSetup &&

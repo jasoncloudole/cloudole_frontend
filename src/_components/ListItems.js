@@ -41,7 +41,7 @@ export default function MainListItems () {
       <ListItemIcon>
         <LayersIcon />
       </ListItemIcon>
-      <ListItemText primary="Sell" />
+      <ListItemText primary="Sell History" />
     </ListItem>
     <ListItem button onClick={logout} >
       <ListItemIcon>
