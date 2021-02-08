@@ -4,6 +4,8 @@ import 'fontsource-roboto';
 import {Route, BrowserRouter as Router, Switch} from 'react-router-dom'
 
 import {Elements} from '@stripe/react-stripe-js';
+import Embedded from './pages/Embedded'
+import EmbeddedCallback from './pages/EmbeddedCallback'
 import Home from './pages/Home'
 import Login from './pages/Login'
 import PrivateRoute from './_components/PrivateRoute';
@@ -24,6 +26,8 @@ function App() {
       <Elements stripe={stripePromise}>
         <Router>
           <Switch>
+            <PublicRoute exact path="/embedded" restricted component={Embedded} />
+            <PublicRoute exact path="/embedded/callback" restricted component={EmbeddedCallback} />
             <PublicRoute exact path="/login" restricted component={Login} />
             <PublicRoute exact path="/signup" restricted component={Signup} />
             <Route exact path="/shopify" component={Shopify} />
