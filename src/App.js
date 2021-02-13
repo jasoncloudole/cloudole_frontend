@@ -15,6 +15,7 @@ import Shopify from './pages/Shopify'
 import Signup from './pages/Signup'
 import axios from 'axios'
 import {loadStripe} from '@stripe/stripe-js';
+import Privacy from './pages/Privacy'
 
 axios.defaults.baseURL = 'https://us-central1-cloudole-2f23d.cloudfunctions.net/api'
 // axios.defaults.baseURL = 'http://localhost:5000/cloudole-2f23d/us-central1/api'
@@ -30,6 +31,7 @@ function App() {
             <PublicRoute exact path="/embedded/callback" restricted component={EmbeddedCallback} />
             <PublicRoute exact path="/login" restricted component={Login} />
             <PublicRoute exact path="/signup" restricted component={Signup} />
+            <Route exact path="/privacy" component={Privacy} />
             <Route exact path="/shopify" component={Shopify} />
             <PrivateRoute path="/" component={Home} />
 
